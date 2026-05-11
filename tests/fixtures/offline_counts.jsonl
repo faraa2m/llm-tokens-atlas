@@ -1,0 +1,6 @@
+{"prompt_id":"fix-001","provider":"openai","format":"plain","model":"gpt-4o-2024-08-06","offline_count":7,"tokenizer_version":"tiktoken@cl100k_base","ts":"2026-05-10T00:01:00Z"}
+{"prompt_id":"fix-001","provider":"anthropic","format":"plain","model":"claude-opus-4-7","offline_count":6,"tokenizer_version":"@tokenometer/core@1.0.0","ts":"2026-05-10T00:01:01Z"}
+{"prompt_id":"fix-002","provider":"openai","format":"markdown","model":"gpt-4o-2024-08-06","offline_count":10,"tokenizer_version":"tiktoken@cl100k_base","ts":"2026-05-10T00:01:02Z"}
+{"prompt_id":"fix-002","provider":"anthropic","format":"markdown","model":"claude-opus-4-7","offline_count":9,"tokenizer_version":"@tokenometer/core@1.0.0","ts":"2026-05-10T00:01:03Z"}
+{"prompt_id":"fix-003","provider":"openai","format":"plain","model":"gpt-4o-2024-08-06","offline_count":4,"tokenizer_version":"tiktoken@cl100k_base","ts":"2026-05-10T00:01:04Z"}
+{"prompt_id":"fix-003","provider":"anthropic","format":"plain","model":"claude-opus-4-7","offline_count":3,"tokenizer_version":"@tokenometer/core@1.0.0","ts":"2026-05-10T00:01:05Z"}

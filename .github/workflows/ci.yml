@@ -1,0 +1,126 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel superseded runs on the same ref to keep CI cheap.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint-test:
+    name: Lint + test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          cache-dependency-glob: |
+            uv.lock
+            pyproject.toml
+
+      - name: Set up Python
+        run: uv python install 3.11
+
+      - name: Sync dependencies
+        run: uv sync --all-extras
+
+      - name: Lint
+        run: make lint
+
+      - name: Test
+        run: make test
+
+  reproduce-tiny:
+    name: Reproduce (tiny, no API keys)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Skip provider steps that need credentials; the targeted PROVIDERS=
+    # subset in `reproduce-tiny` keeps this job credential-free.
+    env:
+      HF_HOME: ${{ github.workspace }}/.cache/huggingface
+      HF_DATASETS_CACHE: ${{ github.workspace }}/.cache/huggingface/datasets
+      TRANSFORMERS_CACHE: ${{ github.workspace }}/.cache/huggingface/transformers
+      # Atlas-specific seed so the tiny run is deterministic.
+      ATLAS_SEED: "42"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          cache-dependency-glob: |
+            uv.lock
+            pyproject.toml
+
+      - name: Set up Python
+        run: uv python install 3.11
+
+      - name: Cache HuggingFace downloads
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.cache/huggingface
+          key: hf-${{ runner.os }}-${{ hashFiles('scripts/collect_corpus.py') }}
+          restore-keys: |
+            hf-${{ runner.os }}-
+
+      - name: Sync dependencies
+        run: uv sync --all-extras
+
+      - name: Run tiny reproduce pipeline (N=5, key-free providers)
+        run: make reproduce-tiny
+
+      - name: Verify parquet row count
+        run: |
+          uv run python - <<'PY'
+          import sys
+          from pathlib import Path
+
+          import pyarrow.parquet as pq
+
+          path = Path("data/processed/atlas.parquet")
+          if not path.exists():
+              print(f"ERROR: expected parquet at {path}", file=sys.stderr)
+              sys.exit(1)
+
+          table = pq.read_table(path)
+          rows = table.num_rows
+          print(f"parquet rows: {rows}")
+          print(f"parquet columns: {table.column_names}")
+
+          # N=5 prompts × (providers in tiny subset) × (formats). Floor is 5
+          # rows (one prompt × one provider × one format); ceiling is loose.
+          # We only assert the dataset is non-empty here; sibling agents
+          # encode the exact cardinality contract in their tests.
+          if rows < 5:
+              print(f"ERROR: parquet has only {rows} rows; expected >= 5", file=sys.stderr)
+              sys.exit(1)
+          PY
+
+      - name: Upload tiny dataset artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atlas-tiny-${{ github.sha }}
+          path: |
+            data/processed/atlas.parquet
+            data/lockfile.json
+            data/raw_prompts.jsonl
+            data/offline_counts.jsonl
+            data/empirical_counts.jsonl
+          if-no-files-found: warn
+          retention-days: 7

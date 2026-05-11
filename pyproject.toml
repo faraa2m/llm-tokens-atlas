@@ -1,0 +1,52 @@
+[project]
+name = "llm-tokens-atlas"
+version = "0.0.1"
+description = "Open benchmark of LLM tokenization across 5 providers — offline vs empirical calibration deltas."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Faraazuddin Mohammed" },
+]
+keywords = ["llm", "tokenization", "benchmark", "evaluation", "calibration"]
+
+dependencies = [
+    "tiktoken>=0.6.0",
+    "anthropic>=0.40.0",
+    "google-generativeai>=0.8.0",
+    "cohere>=5.0.0",
+    "datasets>=2.20.0",
+    "pandas>=2.2.0",
+    "pyarrow>=16.0.0",
+    "tqdm>=4.66.0",
+    "httpx>=0.27.0",
+    "tenacity>=8.5.0",
+    "pydantic>=2.7.0",
+    "mistral-common[sentencepiece]>=1.11.2",
+    "certifi>=2026.4.22",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.5.0",
+    "mypy>=1.10.0",
+    "pytest>=8.2.0",
+    "jupyter>=1.0.0",
+    "matplotlib>=3.9.0",
+    "seaborn>=0.13.0",
+    "jsonschema>=4.26.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["scripts"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "A", "C4", "RET", "SIM"]

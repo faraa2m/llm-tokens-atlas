@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/faraa2m/llm-tokens-atlas/schema/v1.json",
+  "title": "llm-tokens-atlas dataset schema",
+  "description": "Schema (draft 2020-12) for the three JSONL streams that compose llm-tokens-atlas: 'prompts' (data/raw_prompts.jsonl), 'offline_counts' (data/offline_counts.jsonl), and 'empirical_counts' (data/empirical_counts.jsonl). The downstream join key is (prompt_id, provider, format, model). Schema version 1: backwards-compatible additions allowed; breaking changes bump to v2.json.",
+  "type": "object",
+  "$defs": {
+    "format": {
+      "type": "string",
+      "enum": ["markdown", "xml", "json", "yaml", "plain"],
+      "description": "Prompt serialization format. One of five enum values (lowercased)."
+    },
+    "provider": {
+      "type": "string",
+      "enum": ["openai", "anthropic", "google", "mistral", "cohere"],
+      "description": "LLM provider whose tokenizer (offline) or token-count endpoint (empirical) produced the count."
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Provider-namespaced model identifier (e.g. 'claude-opus-4-7', 'gpt-4o-2024-08-06', 'gemini-1.5-pro')."
+    },
+    "prompt_id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_:.\\-]+$",
+      "description": "Stable identifier for a single prompt row in raw_prompts.jsonl. Used as the foreign key in offline_counts and empirical_counts."
+    },
+    "iso8601": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 timestamp in UTC, e.g. '2026-05-10T18:23:00Z'."
+    },
+    "nonNegativeInteger": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "A token count or character length, never negative."
+    },
+    "promptRow": {
+      "type": "object",
+      "description": "One row of data/raw_prompts.jsonl. The canonical source-of-truth text + provenance for a single prompt.",
+      "properties": {
+        "prompt_id": {"$ref": "#/$defs/prompt_id"},
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Provenance corpus or dataset name (e.g. 'lmsys-chat-1m', 'humaneval', 'mt-bench', 'github-readmes', 'wikipedia-multilingual')."
+        },
+        "text": {
+          "type": "string",
+          "description": "The prompt text exactly as it will be sent to the tokenizer / API. UTF-8."
+        },
+        "text_len_chars": {
+          "$ref": "#/$defs/nonNegativeInteger",
+          "description": "Length of 'text' in Unicode codepoints (not bytes)."
+        },
+        "text_len_words": {
+          "$ref": "#/$defs/nonNegativeInteger",
+          "description": "Whitespace-split word count of 'text'. Approximate — intended for filtering/grouping, not as a tokenization signal."
+        },
+        "language": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 16,
+          "description": "ISO-639-1 (or BCP-47) language code: 'en', 'zh', 'es', 'fr', 'de', 'ja', 'multi', 'code', etc. 'code' indicates source code; 'multi' indicates a mixed-language prompt."
+        },
+        "domain": {
+          "type": "string",
+          "enum": ["code", "prose", "chat", "structured", "multilingual", "other"],
+          "description": "High-level domain tag used for stratified analysis."
+        },
+        "collected_at": {"$ref": "#/$defs/iso8601"}
+      },
+      "required": [
+        "prompt_id",
+        "source",
+        "text",
+        "text_len_chars",
+        "text_len_words",
+        "language",
+        "domain",
+        "collected_at"
+      ],
+      "additionalProperties": false
+    },
+    "offlineCountRow": {
+      "type": "object",
+      "description": "One row of data/offline_counts.jsonl. Offline-tokenizer count for a single (prompt_id, provider, format, model) tuple. No network call; pure local tokenization via @tokenometer/core (or the moral equivalent).",
+      "properties": {
+        "prompt_id": {"$ref": "#/$defs/prompt_id"},
+        "provider": {"$ref": "#/$defs/provider"},
+        "format": {"$ref": "#/$defs/format"},
+        "model": {"$ref": "#/$defs/model"},
+        "offline_count": {
+          "$ref": "#/$defs/nonNegativeInteger",
+          "description": "Token count reported by the offline tokenizer. Never negative."
+        },
+        "tokenizer_version": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Pinned tokenizer version identifier (e.g. 'tiktoken@cl100k_base', '@tokenometer/core@1.0.0', 'mistral-common@1.7.0'). Pinned for reproducibility."
+        },
+        "ts": {"$ref": "#/$defs/iso8601"}
+      },
+      "required": [
+        "prompt_id",
+        "provider",
+        "format",
+        "model",
+        "offline_count",
+        "tokenizer_version",
+        "ts"
+      ],
+      "additionalProperties": false
+    },
+    "empiricalCountRow": {
+      "type": "object",
+      "description": "One row of data/empirical_counts.jsonl. Ground-truth token count for a single (prompt_id, provider, format, model) tuple. Sourced from each provider's official countTokens endpoint or (where no endpoint exists) tiktoken-as-truth.",
+      "properties": {
+        "prompt_id": {"$ref": "#/$defs/prompt_id"},
+        "provider": {"$ref": "#/$defs/provider"},
+        "format": {"$ref": "#/$defs/format"},
+        "model": {"$ref": "#/$defs/model"},
+        "empirical_count": {
+          "$ref": "#/$defs/nonNegativeInteger",
+          "description": "Token count reported by the provider's count-tokens endpoint or by tiktoken (when treated as oracle, e.g. for OpenAI)."
+        },
+        "is_oracle": {
+          "type": "boolean",
+          "description": "True when this value is treated as the ground-truth oracle (e.g. tiktoken for OpenAI; provider countTokens API for Anthropic/Google). False when it is an empirical-but-not-official source (e.g. inferred from stream usage)."
+        },
+        "source": {
+          "type": "string",
+          "enum": ["api", "tiktoken", "sdk", "stream-usage"],
+          "description": "How this empirical count was obtained: 'api' = HTTP call to a countTokens endpoint; 'tiktoken' = local tiktoken treated as oracle (OpenAI only); 'sdk' = vendor SDK helper; 'stream-usage' = inferred from generation usage metadata."
+        },
+        "endpoint": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Concrete endpoint or library identifier — e.g. 'https://api.anthropic.com/v1/messages/count_tokens@2024-10-22', 'vertex-ai.googleapis.com/v1/.../countTokens', 'tiktoken.encoding_for_model(gpt-4o)'."
+        },
+        "ts": {"$ref": "#/$defs/iso8601"}
+      },
+      "required": [
+        "prompt_id",
+        "provider",
+        "format",
+        "model",
+        "empirical_count",
+        "is_oracle",
+        "source",
+        "endpoint",
+        "ts"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "tables": {
+      "type": "object",
+      "description": "Index of the three tables in the atlas dataset. Each table.row is a $ref into $defs and identifies the per-row schema used to validate the corresponding JSONL stream.",
+      "properties": {
+        "prompts": {
+          "type": "object",
+          "properties": {
+            "file": {"type": "string", "const": "data/raw_prompts.jsonl"},
+            "primary_key": {
+              "type": "array",
+              "items": {"type": "string"},
+              "const": ["prompt_id"]
+            },
+            "row": {"$ref": "#/$defs/promptRow"}
+          },
+          "required": ["file", "primary_key", "row"]
+        },
+        "offline_counts": {
+          "type": "object",
+          "properties": {
+            "file": {"type": "string", "const": "data/offline_counts.jsonl"},
+            "primary_key": {
+              "type": "array",
+              "items": {"type": "string"},
+              "const": ["prompt_id", "provider", "format", "model"]
+            },
+            "row": {"$ref": "#/$defs/offlineCountRow"}
+          },
+          "required": ["file", "primary_key", "row"]
+        },
+        "empirical_counts": {
+          "type": "object",
+          "properties": {
+            "file": {"type": "string", "const": "data/empirical_counts.jsonl"},
+            "primary_key": {
+              "type": "array",
+              "items": {"type": "string"},
+              "const": ["prompt_id", "provider", "format", "model"]
+            },
+            "row": {"$ref": "#/$defs/empiricalCountRow"}
+          },
+          "required": ["file", "primary_key", "row"]
+        }
+      },
+      "required": ["prompts", "offline_counts", "empirical_counts"]
+    },
+    "join": {
+      "type": "object",
+      "description": "Documented downstream join semantics. scripts/build_dataset.py inner-joins offline_counts and empirical_counts onto prompts using (prompt_id, provider, format, model) to produce the processed Parquet artifact.",
+      "properties": {
+        "key": {
+          "type": "array",
+          "items": {"type": "string"},
+          "const": ["prompt_id", "provider", "format", "model"]
+        },
+        "strategy": {
+          "type": "string",
+          "const": "inner-on-counts-then-attach-prompts"
+        },
+        "computed_columns": {
+          "type": "array",
+          "items": {"type": "string"},
+          "const": ["delta", "delta_pct", "abs_delta", "direction"]
+        }
+      },
+      "required": ["key", "strategy", "computed_columns"]
+    }
+  },
+  "required": ["tables", "join"],
+  "additionalProperties": false
+}

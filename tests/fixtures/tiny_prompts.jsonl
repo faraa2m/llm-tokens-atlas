@@ -1,0 +1,2 @@
+{"prompt_id":"smoke_001","source":"smoke","text":"Hello, world.","text_len_chars":13,"text_len_words":2,"language":"en","domain":"prose","collected_at":"2026-05-10T18:00:00Z"}
+{"prompt_id":"smoke_002","source":"smoke","text":"{\"role\":\"system\",\"content\":\"You are a helpful assistant.\"}","text_len_chars":56,"text_len_words":7,"language":"en","domain":"structured","collected_at":"2026-05-10T18:00:00Z"}

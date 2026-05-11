@@ -1,0 +1,182 @@
+{
+  "dataset": {
+    "n_rows": 7485,
+    "n_prompts": 499,
+    "providers": [
+      "openai",
+      "anthropic",
+      "mistral"
+    ],
+    "formats": [
+      "plain",
+      "markdown",
+      "json",
+      "xml",
+      "yaml"
+    ],
+    "domains": [
+      "code",
+      "prose",
+      "chat"
+    ],
+    "n_nan_delta_pct": 0,
+    "n_zero_empirical": 0
+  },
+  "per_provider": {
+    "openai": {
+      "n": 2495,
+      "median_delta_pct": 0.0,
+      "p25_delta_pct": 0.0,
+      "p75_delta_pct": 5.132453848278206,
+      "p95_delta_pct": 12.5,
+      "mean_delta_pct": 3.013315330635491
+    },
+    "anthropic": {
+      "n": 2495,
+      "median_delta_pct": 41.29069103369503,
+      "p25_delta_pct": 36.805223184285964,
+      "p75_delta_pct": 46.70752538809528,
+      "p95_delta_pct": 58.561816652649256,
+      "mean_delta_pct": 42.10635917080052
+    },
+    "mistral": {
+      "n": 2495,
+      "median_delta_pct": -0.05941770647653001,
+      "p25_delta_pct": -0.9900990099009901,
+      "p75_delta_pct": 4.651162790697675,
+      "p95_delta_pct": 11.76470588235294,
+      "mean_delta_pct": 1.852041847992605
+    }
+  },
+  "format_x_provider_median_delta_pct": {
+    "plain": {
+      "openai": 0.0,
+      "anthropic": 38.81188118811881,
+      "mistral": -0.8403361344537815
+    },
+    "markdown": {
+      "openai": 0.0,
+      "anthropic": 39.41480206540447,
+      "mistral": -0.7352941176470588
+    },
+    "json": {
+      "openai": 6.451612903225806,
+      "anthropic": 43.9873417721519,
+      "mistral": 5.128205128205128
+    },
+    "xml": {
+      "openai": 0.0,
+      "anthropic": 40.84985835694051,
+      "mistral": -0.6369426751592357
+    },
+    "yaml": {
+      "openai": 5.398182789951898,
+      "anthropic": 41.95804195804196,
+      "mistral": 5.244507441530829
+    }
+  },
+  "per_domain": {
+    "code": {
+      "n": 2730,
+      "mean_delta_pct": 14.458044850496844,
+      "std_delta_pct": 17.077125320684008,
+      "median_delta_pct": 5.658259579887476
+    },
+    "prose": {
+      "n": 1770,
+      "mean_delta_pct": 15.75604675663203,
+      "std_delta_pct": 20.481542165605912,
+      "median_delta_pct": 3.7559513313348614
+    },
+    "chat": {
+      "n": 2985,
+      "mean_delta_pct": 16.695399360378328,
+      "std_delta_pct": 21.891697242926124,
+      "median_delta_pct": 5.0
+    }
+  },
+  "per_domain_provider": {
+    "code::openai": {
+      "n": 910,
+      "mean_delta_pct": 3.368264095184813,
+      "sem_delta_pct": 0.15890961421248712
+    },
+    "code::anthropic": {
+      "n": 910,
+      "mean_delta_pct": 37.3674506733359,
+      "sem_delta_pct": 0.2231812350698806
+    },
+    "code::mistral": {
+      "n": 910,
+      "mean_delta_pct": 2.6384197829698204,
+      "sem_delta_pct": 0.14383186225324443
+    },
+    "prose::openai": {
+      "n": 590,
+      "mean_delta_pct": 2.0634002703507046,
+      "sem_delta_pct": 0.12639152635186435
+    },
+    "prose::anthropic": {
+      "n": 590,
+      "mean_delta_pct": 43.984692449336464,
+      "sem_delta_pct": 0.25054108566427996
+    },
+    "prose::mistral": {
+      "n": 590,
+      "mean_delta_pct": 1.2200475502089223,
+      "sem_delta_pct": 0.16351525781551518
+    },
+    "chat::openai": {
+      "n": 995,
+      "mean_delta_pct": 3.251955039005482,
+      "sem_delta_pct": 0.2012124353674718
+    },
+    "chat::anthropic": {
+      "n": 995,
+      "mean_delta_pct": 45.32665072693781,
+      "sem_delta_pct": 0.3277242576890081
+    },
+    "chat::mistral": {
+      "n": 995,
+      "mean_delta_pct": 1.5075923151917074,
+      "sem_delta_pct": 0.24386030557325197
+    }
+  },
+  "bias_direction_share": {
+    "openai": {
+      "underestimate": 0.42404809619238476,
+      "exact": 0.5711422845691383,
+      "overestimate": 0.004809619238476954
+    },
+    "anthropic": {
+      "underestimate": 1.0,
+      "exact": 0.0,
+      "overestimate": 0.0
+    },
+    "mistral": {
+      "underestimate": 0.4212424849699399,
+      "exact": 0.0012024048096192384,
+      "overestimate": 0.5775551102204409
+    }
+  },
+  "calibration_fits": {
+    "openai": {
+      "n": 2495,
+      "slope": 1.0240112110577226,
+      "intercept": 1.750738518195135,
+      "r_squared": 0.9985937321871968
+    },
+    "anthropic": {
+      "n": 2495,
+      "slope": 1.6106802386243957,
+      "intercept": 18.200210388775304,
+      "r_squared": 0.9955847411775588
+    },
+    "mistral": {
+      "n": 2495,
+      "slope": 1.016187427014733,
+      "intercept": 2.494469312944261,
+      "r_squared": 0.9993441331473055
+    }
+  }
+}

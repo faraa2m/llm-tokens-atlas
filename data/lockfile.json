@@ -1,0 +1,136 @@
+{
+  "schema_version": "https://github.com/faraa2m/llm-tokens-atlas/schema/v1.json",
+  "generated_at": "2026-05-11T01:18:50Z",
+  "dataset_commit": "a32b97322388e0a8ca2e1b6943e8285e8b764c20",
+  "python": {
+    "version": "3.11.15",
+    "implementation": "CPython",
+    "executable": "<repo-root>/.venv/bin/python3"
+  },
+  "tokenizer_versions": {
+    "openai": [
+      {
+        "package": "tiktoken",
+        "module": "tiktoken",
+        "version": "0.12.0"
+      }
+    ],
+    "anthropic": [
+      {
+        "package": "anthropic",
+        "module": "anthropic",
+        "version": "0.100.0"
+      }
+    ],
+    "google": [
+      {
+        "package": "google-generativeai",
+        "module": "google.generativeai",
+        "version": "0.8.6"
+      }
+    ],
+    "mistral": [
+      {
+        "package": "mistral-common",
+        "module": "mistral_common",
+        "version": "1.11.2"
+      }
+    ],
+    "cohere": [
+      {
+        "package": "cohere",
+        "module": "cohere",
+        "version": "6.1.0"
+      }
+    ]
+  },
+  "api_endpoints": {
+    "anthropic": {
+      "endpoint": "https://api.anthropic.com/v1/messages/count_tokens",
+      "api_version": "2023-06-01"
+    },
+    "google": {
+      "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/{model}:countTokens",
+      "api_version": "v1beta"
+    },
+    "openai": {
+      "endpoint": "local:tiktoken.encoding_for_model",
+      "api_version": "tiktoken"
+    },
+    "mistral": {
+      "endpoint": "local:mistral_common.Tokenizer",
+      "api_version": "mistral-common"
+    },
+    "cohere": {
+      "endpoint": "https://api.cohere.com/v1/tokenize",
+      "api_version": "v1"
+    }
+  },
+  "dependencies": [
+    {
+      "name": "tiktoken",
+      "spec": "tiktoken>=0.6.0",
+      "installed": "0.12.0"
+    },
+    {
+      "name": "anthropic",
+      "spec": "anthropic>=0.40.0",
+      "installed": "0.100.0"
+    },
+    {
+      "name": "google-generativeai",
+      "spec": "google-generativeai>=0.8.0",
+      "installed": "0.8.6"
+    },
+    {
+      "name": "cohere",
+      "spec": "cohere>=5.0.0",
+      "installed": "6.1.0"
+    },
+    {
+      "name": "datasets",
+      "spec": "datasets>=2.20.0",
+      "installed": "4.8.5"
+    },
+    {
+      "name": "pandas",
+      "spec": "pandas>=2.2.0",
+      "installed": "3.0.2"
+    },
+    {
+      "name": "pyarrow",
+      "spec": "pyarrow>=16.0.0",
+      "installed": "24.0.0"
+    },
+    {
+      "name": "tqdm",
+      "spec": "tqdm>=4.66.0",
+      "installed": "4.67.3"
+    },
+    {
+      "name": "httpx",
+      "spec": "httpx>=0.27.0",
+      "installed": "0.28.1"
+    },
+    {
+      "name": "tenacity",
+      "spec": "tenacity>=8.5.0",
+      "installed": "9.1.4"
+    },
+    {
+      "name": "pydantic",
+      "spec": "pydantic>=2.7.0",
+      "installed": "2.12.5"
+    },
+    {
+      "name": "mistral-common",
+      "spec": "mistral-common[sentencepiece]>=1.11.2",
+      "installed": "1.11.2"
+    },
+    {
+      "name": "certifi",
+      "spec": "certifi>=2026.4.22",
+      "installed": "2026.4.22"
+    }
+  ]
+}
