@@ -1,6 +1,6 @@
 # llm-tokens-atlas
 
-> Open benchmark of LLM tokenization — offline vs empirical calibration deltas. v0.1.0 ships 3 providers (Anthropic, OpenAI, Mistral); Google + Cohere pending for v0.2.0.
+> Open benchmark of LLM tokenization — offline vs empirical calibration deltas. v0.1.0 ships 3 providers (Anthropic, OpenAI, Mistral); Google + Cohere are scheduled for v0.2.0.
 
 ## What this is
 
