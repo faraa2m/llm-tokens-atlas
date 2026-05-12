@@ -3,7 +3,7 @@
 #
 # What this does
 # --------------
-# Makes the tokenometer CLI available to `scripts/tokenometer_bridge.py` in
+# Makes the tokenometer CLI available to `llm_tokens_atlas/tokenometer_bridge.py` in
 # one of three ways, in priority order:
 #
 #   1. If `tokenometer` is already on PATH (e.g. `npm install -g`), do
@@ -97,7 +97,7 @@ Pick one of:
   # Local dev — clone the sibling repo next to this one:
   git clone https://github.com/faraa2m/tokenometer.git ../tokenometer
   (cd ../tokenometer && npm install && npm run build)
-  bash scripts/install_tokenometer.sh   # re-run after the build lands
+  bash llm_tokens_atlas/install_tokenometer.sh   # re-run after the build lands
 
 Then re-run `make install` (or this script directly).
 EOF

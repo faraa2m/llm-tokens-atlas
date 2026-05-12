@@ -1,4 +1,4 @@
-"""Tests for `scripts/collect_corpus.py`.
+"""Tests for `llm_tokens_atlas/collect_corpus.py`.
 
 This module is intentionally minimal: the corpus-collection script is
 network-bound and slow, so we run a single end-to-end smoke test at small
@@ -46,7 +46,7 @@ def test_collect_corpus_smoke(tmp_path: Path, prompt_row_validator: Draft202012V
 
     The test mirrors the acceptance-criteria invocation but at a tiny
     sample size to keep CI runs under a minute. We:
-      1. Invoke `uv run python scripts/collect_corpus.py --n 10
+      1. Invoke `uv run python llm_tokens_atlas/collect_corpus.py --n 10
          --out <tmp>/tiny.jsonl --skip-provenance` as a subprocess.
       2. Assert exit code is 0.
       3. Load the JSONL and verify it has the expected number of rows
@@ -59,7 +59,7 @@ def test_collect_corpus_smoke(tmp_path: Path, prompt_row_validator: Draft202012V
         "uv",
         "run",
         "python",
-        str(REPO_ROOT / "scripts" / "collect_corpus.py"),
+        str(REPO_ROOT / "llm_tokens_atlas" / "collect_corpus.py"),
         "--n",
         "10",
         "--out",
@@ -118,7 +118,7 @@ def test_per_source_targets_sum_to_n_total() -> None:
     don't accidentally short-change the total row count.
     """
     sys.path.insert(0, str(REPO_ROOT))
-    from scripts.collect_corpus import (  # noqa: PLC0415
+    from llm_tokens_atlas.collect_corpus import (  # noqa: PLC0415
         SOURCE_GITHUB_READMES,
         SOURCE_HUMANEVAL,
         SOURCE_MTBENCH,

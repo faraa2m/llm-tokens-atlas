@@ -2,7 +2,7 @@
 
 Usage
 -----
-    uv run python scripts/publish_to_hf.py \
+    uv run python llm_tokens_atlas/publish_to_hf.py \
         --parquet data/processed/atlas.parquet \
         --repo faraa2m/llm-tokens-atlas
 

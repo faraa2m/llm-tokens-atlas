@@ -12,7 +12,7 @@ This project builds on [tokenometer](https://github.com/faraa2m/tokenometer), wh
 
 ## Status
 
-v0.1.0 (released 2026-05-11) — 3-provider coverage (Anthropic + OpenAI + Mistral). Schema, scripts, and data are stable for the three shipped providers; Google + Cohere rows will be added in v0.2.0 without a breaking schema change.
+v0.1.0 (released 2026-05-11) — 3-provider coverage (Anthropic + OpenAI + Mistral). Schema, drivers, and data are stable for the three shipped providers; Google + Cohere rows will be added in v0.2.0 without a breaking schema change.
 
 ## Headline findings (v0.1.0)
 
@@ -40,7 +40,7 @@ uv sync
 
 ## Usage
 
-TBD. See `scripts/` for collection and counting drivers, and `analysis/notebooks/` for plots.
+TBD. See `llm_tokens_atlas/` for collection and counting drivers, and `analysis/notebooks/` for plots.
 
 ## Reproducing results
 
@@ -60,30 +60,27 @@ exercises 3 of them — Anthropic, OpenAI, Mistral — with Google + Cohere
 exercises arriving in v0.2.0) instead of reimplementing it in Python. The
 integration lives in a single module:
 
-- **[`scripts/tokenometer_bridge.py`](./scripts/tokenometer_bridge.py)** —
+- **[`llm_tokens_atlas/tokenometer_bridge.py`](./llm_tokens_atlas/tokenometer_bridge.py)** —
   Python facade over the tokenometer CLI. Exposes `count_offline`,
   `count_empirical`, `list_providers`, `list_models`, `list_formats`,
   plus a `count_offline_batch` / `count_empirical_batch` pair for the
   high-throughput atlas pipeline.
-- **[`scripts/install_tokenometer.sh`](./scripts/install_tokenometer.sh)** —
+- **[`llm_tokens_atlas/install_tokenometer.sh`](./llm_tokens_atlas/install_tokenometer.sh)** —
   idempotent installer; `make install` runs it. Finds tokenometer via (1)
   `tokenometer` on PATH, (2) a sibling `../tokenometer/` repo build, (3)
   builds the sibling if source is present, or (4) fails with an install
   hint.
-- **[`scripts/_tokenometer_bridge_design.md`](./scripts/_tokenometer_bridge_design.md)** —
-  design note: subprocess CLI vs HTTP bridge trade-off, why we chose
-  subprocess.
 
 Any new Python code that needs token counts should import from
-`scripts.tokenometer_bridge`. Do not invoke the tokenometer CLI directly
-from other scripts.
+`llm_tokens_atlas.tokenometer_bridge`. Do not invoke the tokenometer CLI
+directly from other modules.
 
 ## Publishing the dataset
 
 The canonical home for the dataset is
 <https://huggingface.co/datasets/faraa2m/llm-tokens-atlas>. The Hugging Face
 dataset card lives at [`data/README.md`](./data/README.md). The upload
-script is [`scripts/publish_to_hf.py`](./scripts/publish_to_hf.py); set
+script is [`llm_tokens_atlas/publish_to_hf.py`](./llm_tokens_atlas/publish_to_hf.py); set
 `HF_TOKEN` in your env and run it with `--dataset llm-tokens-atlas`.
 
 ## Reproducing

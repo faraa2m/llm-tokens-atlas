@@ -59,7 +59,7 @@ checks.
 
 Usage
 =====
-    uv run python scripts/count_offline.py \\
+    uv run python llm_tokens_atlas/count_offline.py \\
         --in  data/raw_prompts.jsonl \\
         --out data/offline_counts.jsonl
 """
@@ -79,14 +79,16 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Final
 
-# Allow running both as `python scripts/count_offline.py` and as a module.
+# Allow running both as `python -m llm_tokens_atlas.count_offline` and as a
+# top-level script. The package was renamed `scripts` -> `llm_tokens_atlas`
+# during packaging; both forms route to the same imports below.
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-    from scripts._atlas_models import (  # noqa: E402
+    from llm_tokens_atlas._atlas_models import (  # noqa: E402
         PROVIDER_ORDER,
         headline_models,
     )
-    from scripts.format_wrappers import ALL_FORMATS, wrap  # noqa: E402
+    from llm_tokens_atlas.format_wrappers import ALL_FORMATS, wrap  # noqa: E402
 else:
     from ._atlas_models import PROVIDER_ORDER, headline_models
     from .format_wrappers import ALL_FORMATS, wrap

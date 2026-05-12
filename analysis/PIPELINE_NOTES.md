@@ -4,7 +4,7 @@ This file logs sibling-script issues surfaced while running the pipeline
 at N=500. Per the analysis-module brief, sibling code is **not** edited; issues
 are documented here so the relevant owner can patch them when convenient.
 
-## Issue 1 — `scripts/count_offline.py` aborts on prompts containing ChatML special tokens
+## Issue 1 — `llm_tokens_atlas/count_offline.py` aborts on prompts containing ChatML special tokens
 
 **Symptom.** At N=500, the offline counter aborted after writing 5,425 rows
 (roughly 217 prompts × 25 cells) with this `gpt-tokenizer` failure:
@@ -36,7 +36,7 @@ pipeline.
 
 **Mitigations considered.**
 
-1. **Edit `scripts/count_offline.py` to catch + skip.** Rejected per the
+1. **Edit `llm_tokens_atlas/count_offline.py` to catch + skip.** Rejected per the
    "do not edit sibling pipeline code" rule in the analysis brief.
 2. **Edit `tokenometer/packages/core/src/tokenize.ts` to pass
    `allowedSpecial: 'all'`.** Rejected for the same reason; also a true API
@@ -49,7 +49,7 @@ pipeline.
 
 **Recommended pipeline patches.** Either:
 
-- `scripts/count_offline.py`: wrap the `_run_tokenometer(...)` call in a
+- `llm_tokens_atlas/count_offline.py`: wrap the `_run_tokenometer(...)` call in a
   try/except that catches `RuntimeError`, logs the offending `prompt_id`,
   and continues. The lost cells are recorded in a `skipped.jsonl` file.
 - `tokenometer/packages/core/src/tokenize.ts`: thread an
@@ -71,7 +71,7 @@ filtered file. The original `data/raw_prompts.jsonl` is left untouched
 
 ## Issue 2 — `count_offline.py` and `count_empirical.py` ship divergent `DEFAULT_MODELS`
 
-**Symptom.** When `scripts/build_dataset.py` inner-joins offline and
+**Symptom.** When `llm_tokens_atlas/build_dataset.py` inner-joins offline and
 empirical counts on `(prompt_id, provider, format, model)`, several
 provider partitions vanish. Specifically:
 
@@ -93,7 +93,7 @@ likely chosen to mirror a per-provider product family; the offline list
 was chosen to mirror tokenometer's CLI naming conventions.
 
 **Recommended pipeline patch.** Introduce a single `ATLAS_MODELS` constant
-(e.g. in `scripts/_atlas_models.py`) imported by both `count_offline.py`
+(e.g. in `llm_tokens_atlas/_atlas_models.py`) imported by both `count_offline.py`
 and `count_empirical.py`. Either:
 
 - Promote `DEFAULT_MODELS` in `count_offline.py` to a `list[str]` so

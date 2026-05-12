@@ -7,11 +7,11 @@
 #   corpus  -> offline counts -> empirical counts -> build dataset -> lockfile
 #
 # Sibling scripts owned by other pipeline modules:
-#   scripts/collect_corpus.py      (atlas-corpus)
-#   scripts/count_offline.py       (atlas-offline)
-#   scripts/count_empirical.py     (atlas-empirical)
-#   scripts/build_dataset.py       (atlas-schema)
-#   scripts/lockfile.py            (atlas-schema)
+#   llm_tokens_atlas/collect_corpus.py      (atlas-corpus)
+#   llm_tokens_atlas/count_offline.py       (atlas-offline)
+#   llm_tokens_atlas/count_empirical.py     (atlas-empirical)
+#   llm_tokens_atlas/build_dataset.py       (atlas-schema)
+#   llm_tokens_atlas/lockfile.py            (atlas-schema)
 #
 # This Makefile only chains them; it does not implement them.
 
@@ -55,13 +55,13 @@ help: ## Print available targets
 install: ## Install Python dependencies via uv + locate tokenometer CLI
 	@echo ">> Installing dependencies (uv sync --all-extras)"
 	uv sync --all-extras
-	@echo ">> Locating tokenometer CLI (scripts/install_tokenometer.sh)"
-	bash scripts/install_tokenometer.sh
+	@echo ">> Locating tokenometer CLI (llm_tokens_atlas/install_tokenometer.sh)"
+	bash llm_tokens_atlas/install_tokenometer.sh
 
 lint: ## Run ruff + mypy
 	@echo ">> Linting (ruff + mypy)"
 	uv run ruff check .
-	uv run mypy scripts/
+	uv run mypy llm_tokens_atlas/
 
 test: ## Run pytest
 	@echo ">> Running tests (pytest)"
@@ -70,15 +70,15 @@ test: ## Run pytest
 corpus: ## Sample prompts from open corpora into raw_prompts.jsonl
 	@echo ">> Collecting corpus (N=$(N) -> $(RAW_PROMPTS))"
 	@mkdir -p $(DATA_DIR)
-	uv run python scripts/collect_corpus.py --n $(N) --out $(RAW_PROMPTS)
+	uv run python llm_tokens_atlas/collect_corpus.py --n $(N) --out $(RAW_PROMPTS)
 
 offline: ## Compute offline token counts via @tokenometer/core
 	@echo ">> Offline counting ($(RAW_PROMPTS) -> $(OFFLINE_COUNTS))"
-	uv run python scripts/count_offline.py --in $(RAW_PROMPTS) --out $(OFFLINE_COUNTS)
+	uv run python llm_tokens_atlas/count_offline.py --in $(RAW_PROMPTS) --out $(OFFLINE_COUNTS)
 
 empirical: ## Call each provider's empirical token-count endpoint
 	@echo ">> Empirical counting (providers=$(PROVIDERS), $(RAW_PROMPTS) -> $(EMPIRICAL_COUNTS))"
-	uv run python scripts/count_empirical.py \
+	uv run python llm_tokens_atlas/count_empirical.py \
 		--in $(RAW_PROMPTS) \
 		--out $(EMPIRICAL_COUNTS) \
 		--providers $(PROVIDERS)
@@ -86,7 +86,7 @@ empirical: ## Call each provider's empirical token-count endpoint
 build: ## Merge offline+empirical counts into the published parquet dataset
 	@echo ">> Building dataset ($(DATASET_PARQUET))"
 	@mkdir -p $(PROCESSED_DIR)
-	uv run python scripts/build_dataset.py \
+	uv run python llm_tokens_atlas/build_dataset.py \
 		--raw $(RAW_PROMPTS) \
 		--offline $(OFFLINE_COUNTS) \
 		--empirical $(EMPIRICAL_COUNTS) \
@@ -94,7 +94,7 @@ build: ## Merge offline+empirical counts into the published parquet dataset
 
 lockfile: ## Snapshot tokenizer + provider API versions to data/lockfile.json
 	@echo ">> Writing lockfile ($(LOCKFILE))"
-	uv run python scripts/lockfile.py --out $(LOCKFILE)
+	uv run python llm_tokens_atlas/lockfile.py --out $(LOCKFILE)
 
 reproduce: install corpus offline empirical build lockfile ## Full pipeline (override with N=...)
 	@echo ">> Reproduce complete. Dataset: $(DATASET_PARQUET)"

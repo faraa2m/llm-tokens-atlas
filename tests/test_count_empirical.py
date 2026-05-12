@@ -1,4 +1,4 @@
-"""Tests for ``scripts/count_empirical.py``.
+"""Tests for ``llm_tokens_atlas/count_empirical.py``.
 
 Coverage strategy
 -----------------
@@ -31,8 +31,8 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SCRIPTS_DIR = REPO_ROOT / "scripts"
-sys.path.insert(0, str(SCRIPTS_DIR))
+PACKAGE_DIR = REPO_ROOT / "llm_tokens_atlas"
+sys.path.insert(0, str(PACKAGE_DIR))
 
 import count_empirical as ce  # noqa: E402
 

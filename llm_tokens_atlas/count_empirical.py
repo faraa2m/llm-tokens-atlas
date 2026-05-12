@@ -77,7 +77,7 @@ CLI
 
 .. code-block:: bash
 
-    uv run python scripts/count_empirical.py \\
+    uv run python llm_tokens_atlas/count_empirical.py \\
         --in data/raw_prompts.jsonl \\
         --out data/empirical_counts.jsonl \\
         --providers anthropic,google,openai,mistral,cohere \\
@@ -115,10 +115,10 @@ from tenacity import (
 # Local imports                                                               #
 # --------------------------------------------------------------------------- #
 
-# Make the scripts/ folder importable when running as a script.
-SCRIPTS_DIR = Path(__file__).resolve().parent
-if str(SCRIPTS_DIR) not in sys.path:
-    sys.path.insert(0, str(SCRIPTS_DIR))
+# Make the llm_tokens_atlas/ folder importable when running as a script.
+PACKAGE_DIR = Path(__file__).resolve().parent
+if str(PACKAGE_DIR) not in sys.path:
+    sys.path.insert(0, str(PACKAGE_DIR))
 
 from _atlas_models import ATLAS_MODELS  # noqa: E402
 from format_wrappers import ALL_FORMATS, wrap  # noqa: E402
@@ -127,7 +127,7 @@ from format_wrappers import ALL_FORMATS, wrap  # noqa: E402
 # Constants                                                                   #
 # --------------------------------------------------------------------------- #
 
-REPO_ROOT = SCRIPTS_DIR.parent
+REPO_ROOT = PACKAGE_DIR.parent
 
 #: Per-provider model lists. Sourced from :data:`_atlas_models.ATLAS_MODELS`
 #: so the offline and empirical drivers always materialise the same cell

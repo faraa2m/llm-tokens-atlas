@@ -17,7 +17,7 @@ Pinned for reproducibility per the project plan — `make reproduce` should be
 able to recreate the dataset from the lockfile alone.
 
 Usage:
-    uv run python scripts/lockfile.py --out data/lockfile.json
+    uv run python llm_tokens_atlas/lockfile.py --out data/lockfile.json
 """
 
 from __future__ import annotations

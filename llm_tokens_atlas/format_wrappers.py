@@ -18,7 +18,7 @@ Two design choices feed into this module:
    empirical were computed against different byte streams the resulting
    "delta" would conflate tokenizer drift with wrapper drift — useless.
 
-2. Because of (1), `scripts/count_offline.py` wraps in Python first, then
+2. Because of (1), `llm_tokens_atlas/count_offline.py` wraps in Python first, then
    invokes the tokenometer CLI with `--format text` so tokenometer treats the
    wrapped string as opaque text and does not re-wrap. `count_empirical.py`
    (other agent) does the same and sends the wrapped string directly to the

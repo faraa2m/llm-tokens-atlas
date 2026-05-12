@@ -156,7 +156,7 @@ provider, but multilingual coverage is limited and explicitly so. See
 ### Data Files
 
 A single Parquet file at `data/processed/atlas.parquet` is the canonical
-artifact. It is produced by `scripts/build_dataset.py`, which inner-joins
+artifact. It is produced by `llm_tokens_atlas/build_dataset.py`, which inner-joins
 three intermediate JSONL streams — `data/raw_prompts.jsonl`,
 `data/offline_counts.jsonl`, and `data/empirical_counts.jsonl` — on the
 composite key `(prompt_id, provider, format, model)`, then attaches

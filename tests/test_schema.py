@@ -2,9 +2,9 @@
 
 Covers:
 - All three synthetic fixture streams validate against data/schema.json.
-- scripts/build_dataset.py joins correctly and computes the expected
+- llm_tokens_atlas/build_dataset.py joins correctly and computes the expected
   calibration columns row-for-row.
-- scripts/lockfile.py emits a non-empty, valid JSON document with the
+- llm_tokens_atlas/lockfile.py emits a non-empty, valid JSON document with the
   required reproducibility fields.
 """
 
@@ -26,7 +26,7 @@ FIXTURES = REPO_ROOT / "tests" / "fixtures"
 
 sys.path.insert(0, str(REPO_ROOT))
 
-from scripts.build_dataset import (  # noqa: E402
+from llm_tokens_atlas.build_dataset import (  # noqa: E402
     EMPIRICAL_SPEC,
     OFFLINE_SPEC,
     PROMPTS_SPEC,
@@ -35,7 +35,7 @@ from scripts.build_dataset import (  # noqa: E402
     read_jsonl_validated,
     row_validator,
 )
-from scripts.lockfile import build_lockfile  # noqa: E402
+from llm_tokens_atlas.lockfile import build_lockfile  # noqa: E402
 
 # --------------------------------------------------------------------------- #
 # Schema validation                                                           #
@@ -198,11 +198,11 @@ def test_build_dataframe_delta_columns_match_hand_computed(schema):
 
 
 def test_build_dataset_cli_writes_parquet(schema, tmp_path):
-    """End-to-end: run scripts/build_dataset.py as a subprocess and read the Parquet."""
+    """End-to-end: run llm_tokens_atlas/build_dataset.py as a subprocess and read the Parquet."""
     out = tmp_path / "atlas.parquet"
     cmd = [
         sys.executable,
-        str(REPO_ROOT / "scripts" / "build_dataset.py"),
+        str(REPO_ROOT / "llm_tokens_atlas" / "build_dataset.py"),
         "--raw", str(FIXTURES / "raw_prompts.jsonl"),
         "--offline", str(FIXTURES / "offline_counts.jsonl"),
         "--empirical", str(FIXTURES / "empirical_counts.jsonl"),
@@ -248,9 +248,9 @@ def test_lockfile_payload_has_required_fields(tmp_path):
 
 
 def test_lockfile_generator_writes_valid_json(tmp_path):
-    """End-to-end: run scripts/lockfile.py and round-trip the JSON."""
+    """End-to-end: run llm_tokens_atlas/lockfile.py and round-trip the JSON."""
     out = tmp_path / "lockfile.json"
-    cmd = [sys.executable, str(REPO_ROOT / "scripts" / "lockfile.py"), "--out", str(out)]
+    cmd = [sys.executable, str(REPO_ROOT / "llm_tokens_atlas" / "lockfile.py"), "--out", str(out)]
     result = subprocess.run(cmd, capture_output=True, text=True, check=False)
     assert result.returncode == 0, (
         f"lockfile.py failed (rc={result.returncode})\n"

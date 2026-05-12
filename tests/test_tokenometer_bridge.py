@@ -1,7 +1,7 @@
-"""Tests for `scripts/tokenometer_bridge.py`.
+"""Tests for `llm_tokens_atlas/tokenometer_bridge.py`.
 
 These tests exercise the real tokenometer CLI by default (resolved via the
-sibling-repo pinfile written by `scripts/install_tokenometer.sh`, an env
+sibling-repo pinfile written by `llm_tokens_atlas/install_tokenometer.sh`, an env
 override, or `tokenometer` on PATH). When no CLI can be located, every test
 in this module is skipped with one message — that keeps the rest of the
 test suite green on a clean clone that has not yet run `make install`.
@@ -36,7 +36,7 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
-from scripts.tokenometer_bridge import (  # noqa: E402
+from llm_tokens_atlas.tokenometer_bridge import (  # noqa: E402
     ATLAS_FORMATS,
     DEFAULT_MODEL_BY_PROVIDER,
     PROVIDERS,
@@ -65,7 +65,7 @@ def _cli_available() -> bool:
     invocation and treat any locate-time error as "unavailable".
     """
     try:
-        from scripts.tokenometer_bridge import _resolve_cli
+        from llm_tokens_atlas.tokenometer_bridge import _resolve_cli
 
         _resolve_cli()
     except TokenometerNotInstalledError:
@@ -76,7 +76,7 @@ def _cli_available() -> bool:
 cli_required = pytest.mark.skipif(
     not _cli_available(),
     reason=(
-        "tokenometer CLI not locatable; run `bash scripts/install_tokenometer.sh` "
+        "tokenometer CLI not locatable; run `bash llm_tokens_atlas/install_tokenometer.sh` "
         "or set TOKENOMETER_CLI."
     ),
 )
@@ -142,7 +142,7 @@ def test_count_empirical_mistral_raises_without_calling_cli() -> None:
 
     No CLI is invoked: the precheck in `_require_empirical_key` catches it.
     """
-    from scripts.tokenometer_bridge import count_empirical
+    from llm_tokens_atlas.tokenometer_bridge import count_empirical
 
     with pytest.raises(MissingApiKeyError, match="mistral has no public"):
         count_empirical("hello", "mistral", "plain")
