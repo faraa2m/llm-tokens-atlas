@@ -87,7 +87,8 @@ def build_notebook() -> nbf.NotebookNode:
         "TABLES_DIR.mkdir(parents=True, exist_ok=True)\n"
         "# Redact absolute paths from output to keep the notebook portable.\n"
         "print('repo root:', REPO_ROOT.name)\n"
-        "print('parquet path:', PARQUET_PATH.relative_to(REPO_ROOT), 'exists:', PARQUET_PATH.exists())"
+        "print('parquet path:', PARQUET_PATH.relative_to(REPO_ROOT))\n"
+        "print('parquet exists:', PARQUET_PATH.exists())"
     ))
 
     cells.append(_md(
