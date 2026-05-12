@@ -120,8 +120,8 @@ PACKAGE_DIR = Path(__file__).resolve().parent
 if str(PACKAGE_DIR) not in sys.path:
     sys.path.insert(0, str(PACKAGE_DIR))
 
-from _atlas_models import ATLAS_MODELS  # noqa: E402
-from format_wrappers import ALL_FORMATS, wrap  # noqa: E402
+from _atlas_models import ATLAS_MODELS  # type: ignore[import-not-found]  # noqa: E402
+from format_wrappers import ALL_FORMATS, wrap  # type: ignore[import-not-found]  # noqa: E402
 
 # --------------------------------------------------------------------------- #
 # Constants                                                                   #

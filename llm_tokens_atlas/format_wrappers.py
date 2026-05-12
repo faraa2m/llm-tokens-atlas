@@ -44,6 +44,7 @@ output of each wrapper so cross-implementation drift is detectable.
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from typing import Final
 
 Format = str  # one of: "plain" | "markdown" | "json" | "xml" | "yaml"
@@ -129,7 +130,7 @@ def wrap_as_xml(text: str) -> str:
     return f"<prompt>{_xml_escape(text)}</prompt>"
 
 
-_WRAPPERS: Final[dict[str, callable]] = {
+_WRAPPERS: Final[dict[str, Callable[[str], str]]] = {
     "plain": wrap_as_plain,
     "markdown": wrap_as_markdown,
     "json": wrap_as_json,
