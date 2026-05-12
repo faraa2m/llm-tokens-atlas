@@ -1,0 +1,18 @@
+{
+  "release-type": "python",
+  "packages": {
+    ".": {
+      "package-name": "llm-tokens-atlas",
+      "include-component-in-tag": false,
+      "changelog-sections": [
+        {"type": "feat", "section": "Features"},
+        {"type": "fix", "section": "Bug Fixes"},
+        {"type": "perf", "section": "Performance"},
+        {"type": "deps", "section": "Dependencies"},
+        {"type": "docs", "section": "Documentation"},
+        {"type": "chore", "section": "Maintenance", "hidden": false}
+      ]
+    }
+  },
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
+}
