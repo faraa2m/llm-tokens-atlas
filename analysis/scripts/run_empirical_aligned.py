@@ -3,21 +3,21 @@
 Why this script exists
 ======================
 
-The ``scripts/count_offline.py`` driver defaults to **one canonical model
+The ``llm_tokens_atlas/count_offline.py`` driver defaults to **one canonical model
 per provider** (e.g. ``claude-opus-4-7`` for Anthropic), while
-``scripts/count_empirical.py`` defaults to **three models per provider**.
+``llm_tokens_atlas/count_empirical.py`` defaults to **three models per provider**.
 Worse, the two scripts do not share a single source of truth for that
 model list; for Mistral they disagree on the family ID itself
 (``mistral-large-latest`` vs. ``mistral-large-2407``).
 
-When ``scripts/build_dataset.py`` performs its inner-join on
+When ``llm_tokens_atlas/build_dataset.py`` performs its inner-join on
 ``(prompt_id, provider, format, model)``, this mismatch silently drops
 the Mistral rows entirely and only retains the OpenAI cells where
 ``gpt-4o`` is the common model.
 
 Per the atlas-analysis brief we do not edit sibling pipeline scripts;
 we work around the gap from the analysis layer. This driver reuses the
-``Counter`` classes inside ``scripts/count_empirical.py`` but constrains
+``Counter`` classes inside ``llm_tokens_atlas/count_empirical.py`` but constrains
 the model set to **exactly** what the offline driver emits, guaranteeing
 a clean join.
 
@@ -44,11 +44,11 @@ import sys
 import time
 from pathlib import Path
 
-# Make scripts/ importable so we can reuse the Counter classes verbatim.
+# Make llm_tokens_atlas/ importable so we can reuse the Counter classes verbatim.
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
-from scripts.count_empirical import (  # noqa: E402
+from llm_tokens_atlas.count_empirical import (  # noqa: E402
     Cell,
     ProgressWriter,
     _count_with_retry,
@@ -57,9 +57,9 @@ from scripts.count_empirical import (  # noqa: E402
     read_done_keys,
     read_prompts,
 )
-from scripts.format_wrappers import ALL_FORMATS, wrap  # noqa: E402
+from llm_tokens_atlas.format_wrappers import ALL_FORMATS, wrap  # noqa: E402
 
-# These mirror DEFAULT_MODELS in scripts/count_offline.py exactly — one model
+# These mirror DEFAULT_MODELS in llm_tokens_atlas/count_offline.py exactly — one model
 # per provider, so the inner join with the offline output is well-defined.
 ALIGNED_MODELS: dict[str, str] = {
     "anthropic": "claude-opus-4-7",

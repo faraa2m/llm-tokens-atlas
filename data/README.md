@@ -33,9 +33,11 @@ configs:
 # Dataset Card for LLM Tokens Atlas
 
 `llm-tokens-atlas` is an open, reproducible benchmark of LLM tokenization across
-**5 providers** (Anthropic, OpenAI, Google, Mistral, Cohere) and **5 prompt
-formats** (Markdown, XML, JSON, YAML, Plain text), evaluated on thousands of
-real-world prompts. For each `(prompt, provider, model, format)` cell we record
+**3 providers in v0.1.0** (Anthropic `claude-opus-4-7`, OpenAI `gpt-4o`, Mistral
+`mistral-large-latest`) across **5 prompt formats** (Markdown, XML, JSON, YAML,
+Plain text), evaluated on 7,485 real-world prompt requests (n=2,495 per provider,
+499 unique prompts × 5 formats × 3 providers). Google + Cohere parity sweeps are
+scheduled for v0.2.0. For each `(prompt, provider, model, format)` cell we record
 both an *offline* token count (from the provider's published or
 community-reverse-engineered tokenizer) and an *empirical* token count (from the
 provider's authoritative count-tokens API endpoint, where one exists).
@@ -51,6 +53,63 @@ than treat it as exact.
   release.
 - License (data): [CC-BY-4.0](https://github.com/faraa2m/llm-tokens-atlas/blob/main/LICENSE-DATA)
 - License (code): [Apache-2.0](https://github.com/faraa2m/llm-tokens-atlas/blob/main/LICENSE)
+
+## Coverage / What's in this release
+
+| Field | Value |
+|---|---|
+| Version | v0.1.0 (3-provider) |
+| Release date | 2026-05-11 |
+| Total rows | 7,485 |
+| Unique prompts | 499 |
+| Providers shipped | 3 (Anthropic, OpenAI, Mistral) |
+| Providers pending | 2 (Google, Cohere) — schema-reserved, gated on v0.2.0 sweeps |
+| Formats | 5 (plain, markdown, json, xml, yaml) |
+| Domains | 3 (code, prose, chat) |
+
+**Per-provider breakdown:**
+
+| Provider | Model | n | Empirical source |
+|---|---|---|---|
+| anthropic | `claude-opus-4-7` | 2,495 | `messages.countTokens` (Anthropic API) |
+| openai | `gpt-4o` | 2,495 | `tiktoken` `o200k_base` (tiktoken-as-truth, local) |
+| mistral | `mistral-large-latest` | 2,495 | `mistral-tokenizer-js` (vendor OSS tokenizer) |
+
+**Per-format breakdown** (rows are split evenly across formats; each format gets
+1,497 rows total = 499 prompts × 3 providers):
+
+| Format | n total | n per provider |
+|---|---|---|
+| plain | 1,497 | 499 |
+| markdown | 1,497 | 499 |
+| json | 1,497 | 499 |
+| xml | 1,497 | 499 |
+| yaml | 1,497 | 499 |
+
+**Pending for v0.2.0:**
+
+- Google `gemini-2.5-pro` via `model.countTokens` — gated on `GOOGLE_API_KEY` sweep.
+- Cohere `command-r` via `POST /v1/tokenize` — gated on `COHERE_API_KEY` sweep.
+
+Both providers are reserved in the schema and validated end-to-end; the only
+missing piece is the empirical sweep. Rows for these providers will land in
+v0.2.0 without a major-version schema bump.
+
+**Headline empirical finding (v0.1.0):**
+
+- Anthropic `claude-opus-4-7`: cl100k_base offline tokenizer **underestimates**
+  empirical counts by **41.3% median** (p25=36.8%, p75=46.7%, p95=58.6%; n=2,495).
+  OLS calibration fit: slope = 1.611, intercept = 18.20, R² = 0.9956.
+  100% of rows underestimate (no exact or overestimate cases).
+- OpenAI `gpt-4o`: offline `o200k_base` is treated as oracle (tiktoken-as-truth);
+  median delta = 0.0%, mean = 3.01%; calibration fit slope = 1.024, R² = 0.9986;
+  57.1% exact, 42.4% underestimate, 0.5% overestimate.
+- Mistral `mistral-large-latest`: median delta = −0.06% (mistral-tokenizer-js
+  slightly overestimates by construction), mean = 1.85%; slope = 1.016, R² = 0.9993;
+  42.1% underestimate, 57.8% overestimate, ~0% exact.
+
+Per-format × per-provider median deltas and full statistics live in
+`analysis/results.json` (the single source of truth for v0.1.0 numbers).
 
 ## Dataset Summary
 
@@ -97,7 +156,7 @@ provider, but multilingual coverage is limited and explicitly so. See
 ### Data Files
 
 A single Parquet file at `data/processed/atlas.parquet` is the canonical
-artifact. It is produced by `scripts/build_dataset.py`, which inner-joins
+artifact. It is produced by `llm_tokens_atlas/build_dataset.py`, which inner-joins
 three intermediate JSONL streams — `data/raw_prompts.jsonl`,
 `data/offline_counts.jsonl`, and `data/empirical_counts.jsonl` — on the
 composite key `(prompt_id, provider, format, model)`, then attaches
@@ -127,9 +186,9 @@ The processed Parquet has the following columns:
 
 | Field      | Type   | Description |
 |------------|--------|-------------|
-| `provider` | string | One of: `anthropic`, `openai`, `google`, `mistral`, `cohere`. |
+| `provider` | string | One of: `anthropic`, `openai`, `mistral` (shipped in v0.1.0). Schema-reserved future values: `google`, `cohere` (rows land in v0.2.0). |
 | `format`   | string | Surface format the prompt is rendered in. One of: `plain`, `markdown`, `xml`, `json`, `yaml`. |
-| `model`    | string | Concrete model identifier evaluated, e.g. `claude-opus-4-7`, `gpt-4o-2024-08-06`, `gemini-1.5-pro`, `mistral-large-latest`, `command-r-plus`. |
+| `model`    | string | Concrete model identifier evaluated. v0.1.0 ships three: `claude-opus-4-7`, `gpt-4o`, `mistral-large-latest`. Schema also reserves `gemini-2.5-pro` (Google) and `command-r` (Cohere) for v0.2.0. |
 
 **Offline counts (from `offline_counts.jsonl`):**
 
@@ -222,10 +281,28 @@ counts:
    tokenizer (with version pin) is recorded in `tokenizer_id` and in
    `data/lockfile.json`.
 2. **Empirical count** — obtained by calling the provider's authoritative
-   token-counting endpoint (e.g. Anthropic's `messages.countTokens`, Google's
-   `model.countTokens`, OpenAI tiktoken-as-truth where no separate endpoint
-   exists, Cohere's `tokenize`, Mistral's OSS tokenizer). The API version used
-   is recorded in `api_version` and in `data/lockfile.json`.
+   token-counting endpoint or OSS tokenizer. The API version used is recorded
+   in `api_version` and in `data/lockfile.json`.
+
+**Empirical-source coverage in v0.1.0:**
+
+- **Anthropic** — `messages.countTokens` (HTTP, official API). Network sweep
+  executed; empirical counts are authoritative.
+- **OpenAI** — `tiktoken.encoding_for_model("gpt-4o")` with `o200k_base`
+  vocab, run locally. Treated as the oracle (tiktoken-as-truth) since no
+  separate count-tokens HTTP endpoint exists.
+- **Mistral** — `mistral-tokenizer-js` (vendor OSS tokenizer), run locally.
+
+**Not executed in v0.1.0 (schema-validated only, populate in v0.2.0):**
+
+- **Google** — `model.countTokens` HTTP endpoint integration is validated
+  against the schema but the empirical sweep has not been run; no Google
+  rows are present in `data/processed/atlas.parquet` in v0.1.0.
+- **Cohere** — `POST /v1/tokenize` integration is similarly validated but
+  unrun; no Cohere rows are present in v0.1.0.
+
+Both Google and Cohere sweeps land in v0.2.0 alongside their API keys
+(`GOOGLE_API_KEY`, `COHERE_API_KEY`); the row schema is unchanged.
 
 #### Who are the annotators?
 

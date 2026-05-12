@@ -18,7 +18,7 @@ Computed columns:
                   (relative to the offline tokenizer)
 
 Usage:
-  uv run python scripts/build_dataset.py \\
+  uv run python llm_tokens_atlas/build_dataset.py \\
       --raw data/raw_prompts.jsonl \\
       --offline data/offline_counts.jsonl \\
       --empirical data/empirical_counts.jsonl \\

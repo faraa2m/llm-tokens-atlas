@@ -1,4 +1,4 @@
-"""Byte-level pin tests for `scripts/format_wrappers.py`.
+"""Byte-level pin tests for `llm_tokens_atlas/format_wrappers.py`.
 
 These wrappers are load-bearing: both the offline counter (this repo) and
 the empirical counter (sibling agent) must produce *byte-identical* wrapped
@@ -24,7 +24,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
-from scripts.format_wrappers import (  # noqa: E402
+from llm_tokens_atlas.format_wrappers import (  # noqa: E402
     ALL_FORMATS,
     is_format,
     wrap,

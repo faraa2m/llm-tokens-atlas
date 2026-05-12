@@ -89,7 +89,7 @@ Icon
 # offline run). The canonical input is data/raw_prompts.jsonl.
 /data/raw_prompts.remaining.jsonl
 
-# Local tokenometer CLI pointer written by `scripts/install_tokenometer.sh`.
+# Local tokenometer CLI pointer written by `llm_tokens_atlas/install_tokenometer.sh`.
 # Machine-specific (absolute paths into a sibling repo); not portable.
 .tokenometer-cli-path
 .claude/

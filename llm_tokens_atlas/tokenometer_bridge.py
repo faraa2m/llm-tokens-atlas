@@ -19,7 +19,7 @@ models / formats in a single invocation, so a 5000-prompt × 5-provider ×
 5-format run amortizes the ~250 ms Node startup cost across hundreds of
 results — not per cell.
 
-See `scripts/_tokenometer_bridge_design.md` for the full trade-off
+See `llm_tokens_atlas/_tokenometer_bridge_design.md` for the full trade-off
 discussion (subprocess CLI vs HTTP bridge) and the rationale for the chosen
 path.
 
@@ -124,7 +124,7 @@ _CLI_PATH_FILE: Final[Path] = Path(__file__).resolve().parent.parent / ".tokenom
 
 #: Hint for users when the CLI cannot be found.
 _INSTALL_HINT: Final[str] = (
-    "tokenometer CLI not found. Run `bash scripts/install_tokenometer.sh` "
+    "tokenometer CLI not found. Run `bash llm_tokens_atlas/install_tokenometer.sh` "
     "or `npm install -g tokenometer`."
 )
 
@@ -208,7 +208,7 @@ def _resolve_cli() -> list[str]:
 
     1. ``TOKENOMETER_CLI`` env var (CI / explicit override).
     2. ``.tokenometer-cli-path`` file at the repo root (written by
-       ``scripts/install_tokenometer.sh`` when it points the bridge at a
+       ``llm_tokens_atlas/install_tokenometer.sh`` when it points the bridge at a
        sibling-repo build).
     3. ``tokenometer`` binary on ``PATH`` (from a global ``npm install -g``).
     4. ``./node_modules/.bin/tokenometer`` (from a local ``npm install``).

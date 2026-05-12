@@ -57,7 +57,7 @@ Determinism:
     reproducibility we record per-source revisions in `data/provenance.md`.
 
 CLI:
-    uv run python scripts/collect_corpus.py \\
+    uv run python llm_tokens_atlas/collect_corpus.py \\
         --out data/raw_prompts.jsonl \\
         --n 500
 """
@@ -875,9 +875,9 @@ def _write_provenance(
         url="https://raw.githubusercontent.com/",
         license_=(
             "Per-repo (Apache-2.0 / MIT / BSD; see GITHUB_README_REPOS "
-            "list in scripts/collect_corpus.py)"
+            "list in llm_tokens_atlas/collect_corpus.py)"
         ),
-        license_url="https://github.com/faraa2m/llm-tokens-atlas/blob/main/scripts/collect_corpus.py",
+        license_url="https://github.com/faraa2m/llm-tokens-atlas/blob/main/llm_tokens_atlas/collect_corpus.py",
         sampling=(
             "Fetched the canonical README (in `.md` / `.rst` / `.asciidoc` / plain) of "
             "a curated list of well-known repositories via `raw.githubusercontent.com`. "
@@ -893,7 +893,7 @@ def _write_provenance(
             "  title  = {Curated GitHub READMEs for tokenization benchmarking},\n"
             "  author = {Faraazuddin Mohammed and the llm-tokens-atlas authors},\n"
             "  year   = {2026},\n"
-            "  howpublished = {\\url{https://github.com/faraa2m/llm-tokens-atlas/blob/main/scripts/collect_corpus.py}}\n"
+            "  howpublished = {\\url{https://github.com/faraa2m/llm-tokens-atlas/blob/main/llm_tokens_atlas/collect_corpus.py}}\n"
             "}"
         ),
     )

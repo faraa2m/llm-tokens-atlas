@@ -6,10 +6,11 @@ input that contains a recognized OpenAI special token, even when that
 literal appears as plain text. This script drops such prompts from the
 input JSONL so the rest of the pipeline can run.
 
-It is intentionally **not** placed in ``scripts/`` because that directory
-is owned by the corpus/counting pipeline. Living in ``analysis/scripts/``
-keeps the ownership boundary clear: this is an analysis-side workaround,
-not an amendment to the corpus or counting stages.
+It is intentionally **not** placed in ``llm_tokens_atlas/`` because that
+package is owned by the corpus/counting pipeline. Living in
+``analysis/scripts/`` keeps the ownership boundary clear: this is an
+analysis-side workaround, not an amendment to the corpus or counting
+stages.
 
 Usage:
 

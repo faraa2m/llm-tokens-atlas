@@ -1,4 +1,4 @@
-"""End-to-end tests for `scripts/count_offline.py` and `scripts/format_wrappers.py`.
+"""End-to-end tests for `llm_tokens_atlas/count_offline.py` and `llm_tokens_atlas/format_wrappers.py`.
 
 These tests deliberately exercise the **real** tokenometer CLI (resolved via
 the sibling checkout fallback in `TokenometerCli.resolve`). The tokenometer
@@ -24,8 +24,8 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 FIXTURE_PROMPTS = REPO_ROOT / "tests" / "fixtures" / "raw_prompts.jsonl"
 
 sys.path.insert(0, str(REPO_ROOT))
-from scripts.count_offline import TokenometerCli  # noqa: E402
-from scripts.format_wrappers import ALL_FORMATS  # noqa: E402
+from llm_tokens_atlas.count_offline import TokenometerCli  # noqa: E402
+from llm_tokens_atlas.format_wrappers import ALL_FORMATS  # noqa: E402
 
 EXPECTED_FIELDS = frozenset(
     {
@@ -60,10 +60,10 @@ cli_required = pytest.mark.skipif(
 
 
 def _run_offline(in_path: Path, out_path: Path, *extra: str) -> subprocess.CompletedProcess[str]:
-    """Drive `scripts/count_offline.py` as a subprocess. Returns the proc."""
+    """Drive `llm_tokens_atlas/count_offline.py` as a subprocess. Returns the proc."""
     argv = [
         sys.executable,
-        str(REPO_ROOT / "scripts" / "count_offline.py"),
+        str(REPO_ROOT / "llm_tokens_atlas" / "count_offline.py"),
         "--in",
         str(in_path),
         "--out",
@@ -205,7 +205,7 @@ def test_invalid_format_rejected() -> None:
     proc = subprocess.run(
         [
             sys.executable,
-            str(REPO_ROOT / "scripts" / "count_offline.py"),
+            str(REPO_ROOT / "llm_tokens_atlas" / "count_offline.py"),
             "--in",
             str(FIXTURE_PROMPTS),
             "--out",

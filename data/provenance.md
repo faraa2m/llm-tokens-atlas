@@ -99,7 +99,7 @@ schema enum `promptRow.source` declared in `data/schema.json`.
 ### `github-readmes` — GitHub READMEs (curated seed list)
 
 - Dataset URL: <https://raw.githubusercontent.com/>
-- License: Per-repo (Apache-2.0 / MIT / BSD; see GITHUB_README_REPOS list in scripts/collect_corpus.py) (<https://github.com/faraa2m/llm-tokens-atlas/blob/main/scripts/collect_corpus.py>)
+- License: Per-repo (Apache-2.0 / MIT / BSD; see GITHUB_README_REPOS list in llm_tokens_atlas/collect_corpus.py) (<https://github.com/faraa2m/llm-tokens-atlas/blob/main/llm_tokens_atlas/collect_corpus.py>)
 - Upstream revision (snapshot): `n/a (no HF repo)`
 - Rows sampled: **83**
 - Sampling strategy: Fetched the canonical README (in `.md` / `.rst` / `.asciidoc` / plain) of a curated list of well-known repositories via `raw.githubusercontent.com`. All listed repositories use permissive OSS licenses (Apache-2.0, MIT, BSD-3-Clause, or PSF). The full list lives in `GITHUB_README_REPOS` in the collection script for auditability. Order is shuffled with the seeded rng before fetching, so the first N fetched are deterministic. The static seed list is used in lieu of `bigcode/the-stack` (which is auto-gated and therefore breaks the credentials-free path).
@@ -111,7 +111,7 @@ schema enum `promptRow.source` declared in `data/schema.json`.
     title  = {Curated GitHub READMEs for tokenization benchmarking},
     author = {Faraazuddin Mohammed and the llm-tokens-atlas authors},
     year   = {2026},
-    howpublished = {\url{https://github.com/faraa2m/llm-tokens-atlas/blob/main/scripts/collect_corpus.py}}
+    howpublished = {\url{https://github.com/faraa2m/llm-tokens-atlas/blob/main/llm_tokens_atlas/collect_corpus.py}}
   }
   ```
 

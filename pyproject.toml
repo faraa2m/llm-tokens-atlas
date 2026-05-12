@@ -9,6 +9,16 @@ authors = [
     { name = "Faraazuddin Mohammed" },
 ]
 keywords = ["llm", "tokenization", "benchmark", "evaluation", "calibration"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 
 dependencies = [
     "tiktoken>=0.6.0",
@@ -35,14 +45,36 @@ dev = [
     "matplotlib>=3.9.0",
     "seaborn>=0.13.0",
     "jsonschema>=4.26.0",
+    "build>=1.2.0",
+    "twine>=5.0.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/faraa2m/llm-tokens-atlas"
+Source = "https://github.com/faraa2m/llm-tokens-atlas"
+Issues = "https://github.com/faraa2m/llm-tokens-atlas/issues"
+Documentation = "https://huggingface.co/datasets/faraa2m/llm-tokens-atlas"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["scripts"]
+packages = ["llm_tokens_atlas"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "llm_tokens_atlas/",
+    "tests/",
+    "data/schema.json",
+    "data/README.md",
+    "data/LICENSE-DATA",
+    "LICENSE",
+    "LICENSE-DATA",
+    "README.md",
+    "Makefile",
+    "pyproject.toml",
+]
 
 [tool.ruff]
 line-length = 100
