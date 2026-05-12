@@ -14,14 +14,15 @@ name: Publish
 #     a no-op if the version already exists; the run will fail loudly in that
 #     case, which is desired).
 #
-# Setup prerequisites (one-time, see `papers/PUBLISH-AUTOMATION.md` for full
-# walkthrough):
+# Setup prerequisites (one-time):
 #   * PyPI Trusted Publisher registered for `llm-tokens-atlas` pointing at
-#     this repo + workflow filename + `pypi` environment.
+#     this repo + workflow filename + `pypi` environment. Register at
+#     https://pypi.org/manage/account/publishing/
 #   * GitHub environment `pypi` exists in repo settings (Settings > Environments).
 #     Optionally gated with a required-reviewer manual approval.
 #   * Repository secret `HF_TOKEN` set to a fine-grained, write-scoped HF token
-#     for the `faraa2m/llm-tokens-atlas` dataset.
+#     for the `faraa2m/llm-tokens-atlas` dataset. Mint at
+#     https://huggingface.co/settings/tokens
 
 on:
   release:
@@ -139,7 +140,7 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           if [ -z "${HF_TOKEN:-}" ]; then
-            echo "ERROR: HF_TOKEN secret is not set. See papers/PUBLISH-AUTOMATION.md" >&2
+            echo "ERROR: HF_TOKEN secret is not set in repository secrets." >&2
             exit 1
           fi
           # Don't echo the token; just confirm it exists and has non-zero length.
