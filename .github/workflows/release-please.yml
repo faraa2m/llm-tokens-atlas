@@ -1,0 +1,81 @@
+name: release-please
+
+# Release-please bot.
+#
+# Watches `main` for Conventional Commits, opens a "Release PR" with the
+# version bump + CHANGELOG, and on merge tags + publishes a GitHub Release.
+# That release event then fans out to `publish.yml` (PyPI + HF).
+#
+# This workflow has two jobs:
+#   1. release-please — runs the bot; opens the Release PR or, when the
+#      Release PR is merged, creates the tag + GitHub Release.
+#   2. attach-parquet — gated on `release_created == true`. Rebuilds the
+#      atlas.parquet via the key-free `make reproduce-tiny` target and
+#      attaches it to the release as an asset, so that the existing
+#      `publish.yml` HF-publish step (which downloads atlas.parquet from
+#      the release assets) works without any manual `gh release upload`.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - name: Run release-please
+        id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          release-type: python
+          # Single-package config; multi-package would use a manifest with
+          # multiple roots in `release-please-config.json`.
+          package-name: llm-tokens-atlas
+
+  attach-parquet:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          cache-dependency-glob: |
+            uv.lock
+            pyproject.toml
+
+      - name: Set up Python
+        run: uv python install 3.11
+
+      - name: Set up Node (for tokenometer CLI)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install tokenometer CLI
+        run: npm install -g tokenometer
+
+      - name: Sync dependencies
+        run: uv sync --all-extras
+
+      - name: Build parquet (tiny pipeline, no API keys)
+        run: make reproduce-tiny
+
+      - name: Attach parquet to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ needs.release-please.outputs.tag_name }}" \
+            data/processed/atlas.parquet
