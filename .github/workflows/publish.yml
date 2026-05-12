@@ -1,0 +1,165 @@
+name: Publish
+
+# Publish llm-tokens-atlas:
+#   1. Build sdist + wheel
+#   2. Publish to PyPI via Trusted Publisher (OIDC — no long-lived API token)
+#   3. Upload the dataset to HuggingFace via HF_TOKEN secret
+#
+# Triggers:
+#   * release.published — Recommended path. Cut a GitHub Release (tagged
+#     `v<version>` matching `pyproject.toml#project.version`); this workflow
+#     runs automatically.
+#   * workflow_dispatch — Manual rerun lever, for re-publishing the HF dataset
+#     without cutting a new release (PyPI publish is idempotent and will be
+#     a no-op if the version already exists; the run will fail loudly in that
+#     case, which is desired).
+#
+# Setup prerequisites (one-time, see `papers/PUBLISH-AUTOMATION.md` for full
+# walkthrough):
+#   * PyPI Trusted Publisher registered for `llm-tokens-atlas` pointing at
+#     this repo + workflow filename + `pypi` environment.
+#   * GitHub environment `pypi` exists in repo settings (Settings > Environments).
+#     Optionally gated with a required-reviewer manual approval.
+#   * Repository secret `HF_TOKEN` set to a fine-grained, write-scoped HF token
+#     for the `faraa2m/llm-tokens-atlas` dataset.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+# Cancel superseded publish runs on the same ref. We don't want two parallel
+# publishes racing each other.
+concurrency:
+  group: publish-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build-pypi:
+    name: Build sdist + wheel
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install build tooling
+        run: python -m pip install --upgrade pip build
+
+      - name: Build sdist + wheel
+        run: python -m build
+
+      - name: Verify build outputs exist
+        run: |
+          ls -la dist/
+          test -f dist/*.tar.gz
+          test -f dist/*.whl
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  publish-pypi:
+    name: Publish to PyPI (OIDC)
+    needs: build-pypi
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # The `pypi` environment must exist in repo Settings > Environments and
+    # must be referenced in the PyPI Trusted Publisher config. Optional
+    # required-reviewer approval gates publish behind a human click.
+    environment:
+      name: pypi
+      url: https://pypi.org/project/llm-tokens-atlas/
+    permissions:
+      # OIDC token for Trusted Publisher exchange. Without `id-token: write`
+      # `pypa/gh-action-pypi-publish` cannot mint an OIDC token and falls back
+      # to looking for a password, which we deliberately do not provide.
+      id-token: write
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+
+      - name: Publish to PyPI
+        # Trusted Publisher OIDC. No `password:` input — pypa/gh-action-pypi-publish
+        # will exchange the GitHub-issued OIDC token for a short-lived PyPI
+        # API token at publish time. Verify the trusted-publisher registration
+        # on https://pypi.org/manage/account/publishing/ before first run.
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          # `packages-dir` matches where we downloaded the artifact above.
+          packages-dir: dist/
+          # Fail loudly if the version already exists on PyPI rather than
+          # silently skipping — surfaces the "you forgot to bump the version"
+          # mistake immediately.
+          skip-existing: false
+          # Use sigstore attestation (default true on @release/v1). Provenance
+          # attestations appear on the PyPI project page.
+          attestations: true
+
+  publish-hf:
+    name: Publish dataset to HuggingFace
+    needs: publish-pypi
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          cache-dependency-glob: |
+            uv.lock
+            pyproject.toml
+
+      - name: Set up Python
+        run: uv python install 3.11
+
+      - name: Sync dependencies
+        run: uv sync --all-extras
+
+      - name: Verify HF_TOKEN secret is present
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          if [ -z "${HF_TOKEN:-}" ]; then
+            echo "ERROR: HF_TOKEN secret is not set. See papers/PUBLISH-AUTOMATION.md" >&2
+            exit 1
+          fi
+          # Don't echo the token; just confirm it exists and has non-zero length.
+          echo "HF_TOKEN is present (length=${#HF_TOKEN})."
+
+      - name: Dry-run publish to HuggingFace
+        # Idempotency safety net: the dry-run prints the upload manifest
+        # without touching the Hub. If this step fails, the real publish
+        # below will also fail — fail fast.
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          uv run python scripts/publish_to_hf.py --dry-run \
+            --parquet data/processed/atlas.parquet \
+            --repo faraa2m/llm-tokens-atlas
+
+      - name: Publish dataset to HuggingFace
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          uv run python scripts/publish_to_hf.py \
+            --parquet data/processed/atlas.parquet \
+            --repo faraa2m/llm-tokens-atlas
