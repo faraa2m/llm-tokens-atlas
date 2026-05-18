@@ -49,8 +49,6 @@ context-window budgets ahead of a real API call can correct for the bias rather
 than treat it as exact.
 
 - Homepage / source code: <https://github.com/faraa2m/llm-tokens-atlas>
-- Paper: forthcoming arXiv preprint (cs.CL / cs.LG); citation block updated on
-  release.
 - License (data): [CC-BY-4.0](https://github.com/faraa2m/llm-tokens-atlas/blob/main/LICENSE-DATA)
 - License (code): [Apache-2.0](https://github.com/faraa2m/llm-tokens-atlas/blob/main/LICENSE)
 
@@ -395,8 +393,7 @@ Suggested attribution string:
   title        = {{llm-tokens-atlas}: An Open Benchmark of LLM Tokenization Calibration Across Providers and Formats},
   year         = {2026},
   publisher    = {Hugging Face},
-  howpublished = {\url{https://huggingface.co/datasets/faraa2m/llm-tokens-atlas}},
-  note         = {Companion arXiv preprint forthcoming.}
+  howpublished = {\url{https://huggingface.co/datasets/faraa2m/llm-tokens-atlas}}
 }
 ```
 
