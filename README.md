@@ -1,6 +1,6 @@
 # llm-tokens-atlas
 
-> Open benchmark of LLM tokenization — offline vs empirical calibration deltas. v0.1.0 ships 3 providers (Anthropic, OpenAI, Mistral); Google + Cohere pending for v0.2.0.
+> Open benchmark of LLM tokenization — offline vs empirical calibration deltas. v0.1.0 ships 3 providers (Anthropic, OpenAI, Mistral); Google + Cohere are scheduled for v0.2.0.
 
 ## What this is
 
@@ -32,15 +32,79 @@ correctly when the provider's own tokenizer is the oracle.
 
 ## Install
 
-TBD — see `pyproject.toml`. The recommended workflow uses [uv](https://github.com/astral-sh/uv):
+The recommended local workflow uses [uv](https://github.com/astral-sh/uv):
 
 ```bash
 uv sync
+make install
+```
+
+For library use from a project environment:
+
+```bash
+pip install llm-tokens-atlas
 ```
 
 ## Usage
 
-TBD. See `llm_tokens_atlas/` for collection and counting drivers, and `analysis/notebooks/` for plots.
+Load the published dataset from Hugging Face:
+
+```python
+from datasets import load_dataset
+
+dataset = load_dataset("faraa2m/llm-tokens-atlas")
+df = dataset["train"].to_pandas()
+
+anthropic = df[df["provider"] == "anthropic"]
+print(anthropic["delta_pct"].median())
+```
+
+Run a small credentials-free reproduction locally:
+
+```bash
+make reproduce-tiny
+```
+
+Run the full pipeline with the default provider set:
+
+```bash
+make reproduce
+```
+
+Use the Python bridge when another analysis script needs token counts through
+the same Tokenometer path as the published dataset:
+
+```python
+from llm_tokens_atlas.tokenometer_bridge import count_offline
+
+result = count_offline(
+    text="Summarize this support ticket.",
+    provider="openai",
+    model="gpt-4o",
+    format="markdown",
+)
+print(result)
+```
+
+See [`docs/REPRODUCING.md`](./docs/REPRODUCING.md) for provider keys, expected
+runtime, generated files, and CI-sized runs.
+
+## Calibration Examples
+
+Use Atlas when an offline tokenizer needs a correction factor before a large
+batch job:
+
+- **Claude budgeting** — the v0.1.0 Anthropic sweep shows systematic
+  undercounting versus empirical provider counts, so production budgets should
+  include a provider-specific calibration margin.
+- **OpenAI sanity checks** — the `gpt-4o` row acts as an oracle-style baseline
+  for `o200k_base` counting.
+- **Mistral validation** — the Mistral row validates the OSS tokenizer path for
+  SentencePiece-family models.
+
+Generated result tables live in [`analysis/results.json`](./analysis/results.json)
+when the analysis pipeline has been run. Generated figures are expected under
+`analysis/figures/`.
 
 ## Reproducing results
 

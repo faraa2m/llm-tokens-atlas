@@ -1,4 +1,5 @@
-"""End-to-end tests for `llm_tokens_atlas/count_offline.py` and `llm_tokens_atlas/format_wrappers.py`.
+"""End-to-end tests for `llm_tokens_atlas/count_offline.py`
+and `llm_tokens_atlas/format_wrappers.py`.
 
 These tests deliberately exercise the **real** tokenometer CLI (resolved via
 the sibling checkout fallback in `TokenometerCli.resolve`). The tokenometer

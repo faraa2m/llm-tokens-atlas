@@ -81,6 +81,18 @@ jobs:
       - name: Sync dependencies
         run: uv sync --all-extras
 
+      - name: Set up Node (for tokenometer CLI)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install tokenometer CLI globally
+        # `install_tokenometer.sh` (called by `make install`) picks up
+        # `tokenometer` from PATH when available. Globally installing the
+        # published CLI keeps this job credential-free and side-steps the
+        # sibling-repo build path used by local-dev contributors.
+        run: npm install -g tokenometer
+
       - name: Run tiny reproduce pipeline (N=5, key-free providers)
         run: make reproduce-tiny
 

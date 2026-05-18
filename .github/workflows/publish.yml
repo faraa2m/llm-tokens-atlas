@@ -23,6 +23,15 @@ name: Publish
 #   * Repository secret `HF_TOKEN` set to a fine-grained, write-scoped HF token
 #     for the `faraa2m/llm-tokens-atlas` dataset. Mint at
 #     https://huggingface.co/settings/tokens
+#
+# Pre-release requirement: attach atlas.parquet to the GitHub release
+# as an asset BEFORE the release publishes. Either:
+#   * Manually: gh release upload <tag> data/processed/atlas.parquet
+#   * In your release script: include the parquet in the gh release create
+#     command via --attach data/processed/atlas.parquet
+# The publish workflow downloads the asset, not the gitignored source
+# (data/processed/ is in .gitignore so the parquet is not present on the
+# CI runner after `actions/checkout`).
 
 on:
   release:
@@ -120,6 +129,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Download atlas.parquet from release assets
+        # The parquet is gitignored (data/processed/ in .gitignore). Pull it
+        # from the GitHub release that triggered this workflow run. For
+        # workflow_dispatch runs, fall back to the latest release tag.
+        # `gh` is preinstalled on ubuntu-latest runners.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p data/processed
+          TAG="${{ github.event.release.tag_name }}"
+          if [ -z "${TAG}" ]; then
+            TAG=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
+            echo "workflow_dispatch run — falling back to latest tag: ${TAG}"
+          fi
+          gh release download "${TAG}" \
+            --pattern 'atlas.parquet' \
+            --dir data/processed/
+          ls -la data/processed/atlas.parquet
 
       - name: Install uv
         uses: astral-sh/setup-uv@v3
