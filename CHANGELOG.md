@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3](https://github.com/faraa2m/llm-tokens-atlas/compare/v0.0.2...v0.0.3) (2026-05-18)
+
+
+### Documentation
+
+* clarify atlas usage and citation ([4ec29a9](https://github.com/faraa2m/llm-tokens-atlas/commit/4ec29a9d1f439b790fbaef4ce400d967a710cce2))
+
 ## [0.0.2](https://github.com/faraa2m/llm-tokens-atlas/compare/v0.0.1...v0.0.2) (2026-05-12)
 
 
